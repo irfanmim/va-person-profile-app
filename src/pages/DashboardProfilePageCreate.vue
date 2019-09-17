@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import ProfileFormCreate from '../components/ProfileFormCreate.vue'
+import ProfileFormCreate from '../components/dashboard/ProfileFormCreate.vue'
 
 export default {
   name: 'FormProfileCreate',

@@ -1,11 +1,12 @@
 <template>
-    <b-container>
-        <h1 class="text-center mt-3 mb-3">Create Profile</h1>
+    <div>
+        <b-button variant="outline-secondary" size="sm" :to="{ name: 'list-person-profile'}">Back</b-button>
+        <h2 class="mt-4 mb-3">Add Person Profile</h2>
         <b-form @submit="onSubmit">
             <b-form-group id="input-group-1" :label-cols-md="2" label="First Name:" label-for="input-1">
                 <b-form-input
                 id="input-1"
-                v-model="form.firstName"
+                v-model="form.first_name"
                 placeholder="Enter first name"
                 required
                 ></b-form-input>
@@ -14,7 +15,7 @@
             <b-form-group id="input-group-2" :label-cols-md="2" label="Last Name:" label-for="input-2">
                 <b-form-input
                 id="input-2"
-                v-model="form.lastName"
+                v-model="form.last_name"
                 placeholder="Enter last name"
                 required
                 ></b-form-input>
@@ -49,7 +50,8 @@
             <b-form-group id="input-group-6" :label-cols-md="2" label="Upload Photo:" label-for="input-6">
                 <b-form-file
                 id="input-6"
-                v-model="form.file"
+                v-model="form.photo"
+                accept="image/*"
                 placeholder="Choose a file or drop it here..."
                 drop-placeholder="Drop file here..."
                 ></b-form-file>
@@ -72,13 +74,13 @@
             <b-form-group id="input-group-8" :label-cols-md="2" label="Phone Number:" label-for="input-8">
                 <b-form-input
                 id="input-8"
-                v-model="form.phoneNumber"
+                v-model="form.phone_number"
                 placeholder="Enter phone number"
-                :state="successValidation.phoneNumber"
+                :state="successValidation.phone_number"
                 required
                 ></b-form-input>
-                <b-form-invalid-feedback :state="successValidation.phoneNumber">
-                    {{errorMessage.phoneNumber}}
+                <b-form-invalid-feedback :state="successValidation.phone_number">
+                    {{errorMessage.phone_number}}
                 </b-form-invalid-feedback>
             </b-form-group>
 
@@ -95,52 +97,52 @@
                 </b-form-invalid-feedback>
             </b-form-group>
 
-            <b-form-group id="input-group-10" :label-cols-md="2" label="User ID:" label-for="input-10">
-                <b-form-input
-                id="input-2"
-                v-model="form.userId"
-                placeholder="Enter user id"
-                required
-                disabled
-                ></b-form-input>
-            </b-form-group>
-
             <b-form-group class="text-center mt-5">
-                <b-button type="submit" variant="primary">Submit</b-button>
+                <b-button type="submit" variant="primary" v-if="!is_loading">Submit</b-button>
+                <b-spinner variant="primary" label="Spinning" v-if="is_loading"></b-spinner>
             </b-form-group>
         </b-form>
-    </b-container>
+    </div>
 </template>
 
 <script>
+  import profileService from '../../services/profileService.js'
+
   export default {
     data() {
       return {
         form: {
-          userId: 1,
-          firstName: '',
-          lastName: '',
+          first_name: '',
+          last_name: '',
           date: '',
           gender: 'Male',
           nationality: '',
-          file: null,
+          photo: null,
           email: '',
-          phoneNumber: '',
+          phone_number: '',
           username: '',
         },
         successValidation: {
           email: null,
-          phoneNumber: null,
+          phone_number: null,
           username: null,
         },
-        errorMessage: {}
+        errorMessage: {},
+        is_loading: false
       }
     },
     methods: {
       onSubmit(e) {
         e.preventDefault();
         if (this.isFormDataValid()){
-            this.$router.push({ name: 'result', params: { data: this.form } })
+            this.is_loading = true;
+            profileService.create(this.form)
+                .then(() => {
+                    this.$router.push({ name: 'list-person-profile'})
+                })
+                .finally(() => {
+                    this.is_loading = false;
+                })
         }
       },
       isFormDataValid() {
@@ -160,12 +162,12 @@
       },
       validatePhoneNumber() {
         let isValid = true;
-        if (!/^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,7}$/.test(this.form.phoneNumber)) {
-            this.successValidation.phoneNumber = false;
-            this.errorMessage.phoneNumber = "Phone number format is invalid, phone number must be number and length must be 10-13"
+        if (!/^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,7}$/.test(this.form.phone_number)) {
+            this.successValidation.phone_number = false;
+            this.errorMessage.phone_number = "Phone number format is invalid, phone number must be number and length must be 10-13"
             isValid = false;
         } else {
-            this.successValidation.phoneNumber = null;
+            this.successValidation.phone_number = null;
         }
 
         return isValid;

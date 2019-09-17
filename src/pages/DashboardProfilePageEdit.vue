@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import ProfileFormEdit from '../components/ProfileFormEdit.vue'
+import ProfileFormEdit from '../components/dashboard/ProfileFormEdit.vue'
 
 export default {
   name: 'ProfilePageEdit',
